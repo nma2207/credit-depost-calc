@@ -2,35 +2,39 @@
 #include <QVBoxLayout>
 #include<QGridLayout>
 #include<QHeaderView>
+#include<QLocale>
 DepositCalcWidget::DepositCalcWidget(QWidget *parent) : QWidget(parent)
 {
     sumLabel = new QLabel ("Сумма (руб.)");
     procentLabel = new QLabel ("Процент годовых");
     timeLabel = new QLabel("Период (мес.)");
-
+    startDepLabel = new QLabel("Начало выплат");
 
     sumLine = new QLineEdit();
     procentLine = new QLineEdit();
     timeLine = new QLineEdit();
-
+    startDepositDate = new QDateEdit(QDate::currentDate());
+    startDepositDate->setDisplayFormat("MMMM yyyy");
 
     QGridLayout* layout =  new QGridLayout;
     layout->addWidget(sumLabel,0,0);
     layout->addWidget(procentLabel,1,0);
     layout->addWidget(timeLabel,2,0);
+    layout->addWidget(startDepLabel, 3, 0);
 
     layout->addWidget(sumLine,0,1);
     layout->addWidget(procentLine,1,1);
     layout->addWidget(timeLine,2,1);
+    layout->addWidget(startDepositDate, 3, 1);
 
 
     QVBoxLayout *genLayout=new QVBoxLayout;
     genLayout->addLayout(layout);
 
     depositTable = new QTableWidget;
-    depositTable->setColumnCount(3);
+    depositTable->setColumnCount(4);
 
-    depositTable->setHorizontalHeaderLabels({"№ месяца", "Cумма", "Процент"});
+    depositTable->setHorizontalHeaderLabels({"№ выплаты","Месяц", "Cумма", "Процент"});
     depositTable->verticalHeader()->hide();
 
     genLayout->addWidget(depositTable);
@@ -48,17 +52,21 @@ void DepositCalcWidget::calcDeposit()
     time = timeLine->text().toInt();
     qreal sumProcent=0;
     depositTable->setRowCount(time+1);
+    QLocale *c=new QLocale();
+    QDate payDay = startDepositDate->date();
     for(qint32 i=0;i<time;i++)
     {
         depositTable->setItem(i, 0, new QTableWidgetItem(QString::number(i+1)));
         qreal procentPay = newSum*procent;
         newSum+=procentPay;
         sumProcent+=procentPay;
-        depositTable->setItem(i,1, new QTableWidgetItem(QString::number(newSum, 'f',2)));
-        depositTable->setItem(i,2, new QTableWidgetItem(QString::number(procentPay, 'f',2)));
+        depositTable->setItem(i, 1, new QTableWidgetItem(c->toString(payDay, "MMMM yyyy")));
+        payDay = payDay.addMonths(1);
+        depositTable->setItem(i,2, new QTableWidgetItem(c->toCurrencyString(newSum, " ")));
+        depositTable->setItem(i,3, new QTableWidgetItem(c->toCurrencyString(procentPay, " ")));
     }
     depositTable->setItem(time, 0, new QTableWidgetItem("Итого"));
-    depositTable->setItem(time,1, new QTableWidgetItem(QString::number(newSum, 'f',2)));
-    depositTable->setItem(time,2, new QTableWidgetItem(QString::number(sumProcent, 'f',2)));
+    depositTable->setItem(time,2, new QTableWidgetItem(c->toCurrencyString(newSum, " ")));
+    depositTable->setItem(time,3, new QTableWidgetItem(c->toCurrencyString(sumProcent, " ")));
 
 }

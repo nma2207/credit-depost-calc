@@ -9,30 +9,35 @@ CreditCalcWidget::CreditCalcWidget(QWidget *parent) : QWidget(parent)
     procentLabel = new QLabel ("Процент годовых");
     timeLabel = new QLabel("Период (мес.)");
     typeLabel = new QLabel ("Схема кредитования");
+    startCreditLabel = new QLabel("Начало выплат");
 
     sumLine = new QLineEdit();
     procentLine = new QLineEdit();
     timeLine = new QLineEdit();
     typeComboBox = new QComboBox();
     typeComboBox->addItems({"Дифференцированный", "Аннуитетный"});
+    startCreditTime = new QDateEdit(QDate::currentDate());
+    startCreditTime->setDisplayFormat("MMMM yyyy");
+
 
     QGridLayout* layout =  new QGridLayout;
     layout->addWidget(sumLabel,0,0);
     layout->addWidget(procentLabel,1,0);
     layout->addWidget(timeLabel,2,0);
     layout->addWidget(typeLabel,3,0);
+    layout->addWidget(startCreditLabel, 4,0);
     layout->addWidget(sumLine,0,1);
     layout->addWidget(procentLine,1,1);
     layout->addWidget(timeLine,2,1);
     layout->addWidget(typeComboBox,3,1);
-
+    layout->addWidget(startCreditTime, 4,1);
     QVBoxLayout *genLayout=new QVBoxLayout;
     genLayout->addLayout(layout);
 
     creditTable = new QTableWidget;
-    creditTable->setColumnCount(5);
+    creditTable->setColumnCount(6);
 
-    creditTable->setHorizontalHeaderLabels({"№ месяца", "Остаток","Основной", "Процент", "Общий платеж"});
+    creditTable->setHorizontalHeaderLabels({"№ платежа","Месяц", "Остаток","Основной", "Процент", "Общий платеж"});
     creditTable->verticalHeader()->hide();
 
     genLayout->addWidget(creditTable);
@@ -51,7 +56,7 @@ void CreditCalcWidget::calcCredit()
     QString type = typeComboBox->currentText();
     creditTable->setRowCount(time+1);
     //creditTable->clear();
-    //creditTable->setHorizontalHeaderLabels({"№ месяца", "Остаток","Основной", "Процент", "Общий платеж"});
+    //creditTable->setHorizontalHeaderLabels({"№ пла", "Остаток","Основной", "Процент", "Общий платеж"});
 
     if(type=="Дифференцированный")
         this->calcDiffCredit();
@@ -64,26 +69,31 @@ void CreditCalcWidget::calcDiffCredit()
     qreal basePay = sum/time;
     qreal result=0;
     qreal sumProcent=0;
+    QLocale *c = new QLocale();
+    QDate payDay = startCreditTime->date();
 
     for(int i=0;i<time; i++)
     {
         creditTable->setItem(i,0, new QTableWidgetItem(QString::number(i+1)));
-        creditTable->setItem(i,1, new QTableWidgetItem(QString::number(remain,'f',2)));
-        creditTable->setItem(i,2, new QTableWidgetItem(QString::number(basePay,'f',2)));
+        creditTable->setItem(i,1, new QTableWidgetItem(c->toString(payDay, "MMMM yyyy")));
+        payDay = payDay.addMonths(1);
+
+        creditTable->setItem(i,2, new QTableWidgetItem(c->toCurrencyString(remain, " ")));
+        creditTable->setItem(i,3, new QTableWidgetItem(c->toCurrencyString(basePay, " ")));
         qreal percentPay = remain*procent;
-        creditTable->setItem(i,3, new QTableWidgetItem(QString::number(percentPay,'f',2)));
-        creditTable->setItem(i,4, new QTableWidgetItem(QString::number(basePay+percentPay,'f',2)));
+        creditTable->setItem(i,4, new QTableWidgetItem(c->toCurrencyString(percentPay, " ")));
+        creditTable->setItem(i,5, new QTableWidgetItem(c->toCurrencyString(basePay+percentPay, " ")));
         remain-=basePay;
         result+=(basePay+percentPay);
         sumProcent+=percentPay;
 
     }
     creditTable->setItem(time,0, new QTableWidgetItem("Итого"));
-    creditTable->setItem(time,1, new QTableWidgetItem(QString::number(0, 'f',2)));
-    creditTable->setItem(time,2, new QTableWidgetItem(QString::number(sum, 'f',2)));
+    creditTable->setItem(time,2, new QTableWidgetItem(c->toCurrencyString(0, " ")));
+    creditTable->setItem(time,3, new QTableWidgetItem(c->toCurrencyString(sum, " ")));
 
-    creditTable->setItem(time,3, new QTableWidgetItem(QString::number(sumProcent, 'f',2)));
-    creditTable->setItem(time,4, new QTableWidgetItem(QString::number(result, 'f',2)));
+    creditTable->setItem(time,4, new QTableWidgetItem(c->toCurrencyString(sumProcent, " ")));
+    creditTable->setItem(time,5, new QTableWidgetItem(c->toCurrencyString(result, " ")));
 }
 qreal powN(qreal a, qint32 n)
 {
@@ -99,15 +109,19 @@ void CreditCalcWidget::calcAnniutCredit()
     qreal remain=sum;
     qreal result=0;
     qreal resultPercent=0;
+    QLocale *c=new QLocale();
+    QDate payDay = startCreditTime->date();
     for(int i=0;i<time; i++)
     {
         creditTable->setItem(i,0, new QTableWidgetItem(QString::number(i+1)));
-        creditTable->setItem(i,1, new QTableWidgetItem(QString::number(remain,'f',2)));
+        creditTable->setItem(i,1, new QTableWidgetItem(c->toString(payDay, "MMMM yyyy")));
+        payDay = payDay.addMonths(1);
+        creditTable->setItem(i,2, new QTableWidgetItem(c->toCurrencyString(remain, " ")));
         qreal percentPay = remain*procent;
         qreal basePay = monthPay-percentPay;
-        creditTable->setItem(i,2, new QTableWidgetItem(QString::number(basePay,'f',2)));
-        creditTable->setItem(i,3, new QTableWidgetItem(QString::number(percentPay,'f',2)));
-        creditTable->setItem(i,4, new QTableWidgetItem(QString::number(monthPay,'f',2)));
+        creditTable->setItem(i,3, new QTableWidgetItem(c->toCurrencyString(basePay, " ")));
+        creditTable->setItem(i,4, new QTableWidgetItem(c->toCurrencyString(percentPay, " ")));
+        creditTable->setItem(i,5, new QTableWidgetItem(c->toCurrencyString(monthPay, " ")));
         result +=monthPay;
         resultPercent+=percentPay;
         remain-=basePay;
@@ -115,10 +129,15 @@ void CreditCalcWidget::calcAnniutCredit()
     }
 
     creditTable->setItem(time,0, new QTableWidgetItem("Итого"));
-    creditTable->setItem(time,1, new QTableWidgetItem(QString::number(0,'f',2)));
-    creditTable->setItem(time,2, new QTableWidgetItem(QString::number(sum,'f',2)));
+    creditTable->setItem(time,2, new QTableWidgetItem(c->toCurrencyString(0, " ")));
+    creditTable->setItem(time,3, new QTableWidgetItem(c->toCurrencyString(sum, " ")));
 
-    creditTable->setItem(time,3, new QTableWidgetItem(QString::number(resultPercent,'f',2)));
-    creditTable->setItem(time,4, new QTableWidgetItem(QString::number(result,'f',2)));
+    creditTable->setItem(time,4, new QTableWidgetItem(c->toCurrencyString(resultPercent, " ")));
+    creditTable->setItem(time,5, new QTableWidgetItem(c->toCurrencyString(result, " ")));
 
+}
+
+int CreditCalcWidget::getWidth() const
+{
+    return creditTable->width();
 }

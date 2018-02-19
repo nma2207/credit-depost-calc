@@ -6,6 +6,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QTableWidget>
+#include <QDateEdit>
 class DepositCalcWidget : public QWidget
 {
     Q_OBJECT
@@ -16,11 +17,13 @@ private:
     QLabel *sumLabel;
     QLabel *procentLabel;
     QLabel *timeLabel;
+    QLabel *startDepLabel;
 
 
     QLineEdit *sumLine;
     QLineEdit *procentLine;
     QLineEdit *timeLine;
+    QDateEdit *startDepositDate;
 
 
     QPushButton *calcButton;

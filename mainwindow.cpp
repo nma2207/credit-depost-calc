@@ -9,9 +9,12 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     QTabWidget *tab=new QTabWidget();
-    tab->addTab(new CreditCalcWidget(), "Кредитный");
+    CreditCalcWidget *creditCalcWidget=new CreditCalcWidget();
+    tab->addTab(creditCalcWidget, "Кредитный");
     tab->addTab(new DepositCalcWidget(), "Депозитный");
-    tab->setBaseSize(500,500);
+
+    //tab->setBaseSize(500,500);
+    this->setMinimumWidth(creditCalcWidget->getWidth()+200);
     this->setCentralWidget(tab);
 }
 
