@@ -15,10 +15,12 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     creditcalcwidget.cpp \
-    depositcalcwidget.cpp
+    depositcalcwidget.cpp \
+    myqtablewidgetite.cpp
 
 HEADERS  += mainwindow.h \
     creditcalcwidget.h \
-    depositcalcwidget.h
+    depositcalcwidget.h \
+    myqtablewidgetite.h
 
 FORMS    += mainwindow.ui

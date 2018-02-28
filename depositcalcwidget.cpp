@@ -3,6 +3,7 @@
 #include<QGridLayout>
 #include<QHeaderView>
 #include<QLocale>
+#include"myqtablewidgetite.h"
 DepositCalcWidget::DepositCalcWidget(QWidget *parent) : QWidget(parent)
 {
     sumLabel = new QLabel ("Сумма (руб.)");
@@ -62,11 +63,11 @@ void DepositCalcWidget::calcDeposit()
         sumProcent+=procentPay;
         depositTable->setItem(i, 1, new QTableWidgetItem(c->toString(payDay, "MMMM yyyy")));
         payDay = payDay.addMonths(1);
-        depositTable->setItem(i,2, new QTableWidgetItem(c->toCurrencyString(newSum, " ")));
-        depositTable->setItem(i,3, new QTableWidgetItem(c->toCurrencyString(procentPay, " ")));
+        depositTable->setItem(i,2, new MyQTableWidgetItem(c->toCurrencyString(newSum, " ")));
+        depositTable->setItem(i,3, new MyQTableWidgetItem(c->toCurrencyString(procentPay, " ")));
     }
     depositTable->setItem(time, 0, new QTableWidgetItem("Итого"));
-    depositTable->setItem(time,2, new QTableWidgetItem(c->toCurrencyString(newSum, " ")));
-    depositTable->setItem(time,3, new QTableWidgetItem(c->toCurrencyString(sumProcent, " ")));
+    depositTable->setItem(time,2, new MyQTableWidgetItem(c->toCurrencyString(newSum, " ")));
+    depositTable->setItem(time,3, new MyQTableWidgetItem(c->toCurrencyString(sumProcent, " ")));
 
 }

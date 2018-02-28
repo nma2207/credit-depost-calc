@@ -3,6 +3,7 @@
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include<QLocale>
+#include"myqtablewidgetite.h"
 CreditCalcWidget::CreditCalcWidget(QWidget *parent) : QWidget(parent)
 {
     sumLabel = new QLabel ("Сумма (руб.)");
@@ -78,22 +79,22 @@ void CreditCalcWidget::calcDiffCredit()
         creditTable->setItem(i,1, new QTableWidgetItem(c->toString(payDay, "MMMM yyyy")));
         payDay = payDay.addMonths(1);
 
-        creditTable->setItem(i,2, new QTableWidgetItem(c->toCurrencyString(remain, " ")));
-        creditTable->setItem(i,3, new QTableWidgetItem(c->toCurrencyString(basePay, " ")));
+        creditTable->setItem(i,2, new MyQTableWidgetItem(c->toCurrencyString(remain, " ")));
+        creditTable->setItem(i,3, new MyQTableWidgetItem(c->toCurrencyString(basePay, " ")));
         qreal percentPay = remain*procent;
-        creditTable->setItem(i,4, new QTableWidgetItem(c->toCurrencyString(percentPay, " ")));
-        creditTable->setItem(i,5, new QTableWidgetItem(c->toCurrencyString(basePay+percentPay, " ")));
+        creditTable->setItem(i,4, new MyQTableWidgetItem(c->toCurrencyString(percentPay, " ")));
+        creditTable->setItem(i,5, new MyQTableWidgetItem(c->toCurrencyString(basePay+percentPay, " ")));
         remain-=basePay;
         result+=(basePay+percentPay);
         sumProcent+=percentPay;
 
     }
     creditTable->setItem(time,0, new QTableWidgetItem("Итого"));
-    creditTable->setItem(time,2, new QTableWidgetItem(c->toCurrencyString(0, " ")));
-    creditTable->setItem(time,3, new QTableWidgetItem(c->toCurrencyString(sum, " ")));
+    creditTable->setItem(time,2, new MyQTableWidgetItem(c->toCurrencyString(0, " ")));
+    creditTable->setItem(time,3, new MyQTableWidgetItem(c->toCurrencyString(sum, " ")));
 
-    creditTable->setItem(time,4, new QTableWidgetItem(c->toCurrencyString(sumProcent, " ")));
-    creditTable->setItem(time,5, new QTableWidgetItem(c->toCurrencyString(result, " ")));
+    creditTable->setItem(time,4, new MyQTableWidgetItem(c->toCurrencyString(sumProcent, " ")));
+    creditTable->setItem(time,5, new MyQTableWidgetItem(c->toCurrencyString(result, " ")));
 }
 qreal powN(qreal a, qint32 n)
 {
